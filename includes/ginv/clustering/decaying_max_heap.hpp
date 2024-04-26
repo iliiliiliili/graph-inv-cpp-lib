@@ -1,3 +1,8 @@
+#ifndef DECAYING_MAX_HEAP_HPP_
+#define DECAYING_MAX_HEAP_HPP_
+
+#include <string>
+#include <tuple>
 #include <vector>
 
 namespace clustering {
@@ -54,8 +59,10 @@ private:
     {
     }
 
-    void assign_value(size_t target, size_t source)
+    void assign_value(size_t target, TKeys... keys, TValue value)
     {
     }
 };
 }
+
+#endif
