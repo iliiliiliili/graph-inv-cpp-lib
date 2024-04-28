@@ -138,3 +138,47 @@ TEST(ClusteringDecayingMaxHeap, ThrowsOnRemovingNonExistingElement)
         }
     }
 }
+
+TEST(ClusteringDecayingMaxHeap, UpdatesValues)
+{
+
+    clustering::DecayingMaxHeap<float, uint8_t> heap(10);
+
+    auto values = std::vector {
+        std::make_tuple(14, 4.0f),
+        std::make_tuple(11, 1.0f),
+        std::make_tuple(13, 3.0f),
+        std::make_tuple(10, 0.0f),
+        std::make_tuple(12, 2.0f),
+    };
+
+    auto target = std::vector {
+        std::make_tuple(11, 4.0f),
+        std::make_tuple(13, 3.0f),
+        std::make_tuple(12, 2.0f),
+        std::make_tuple(14, 1.0f),
+        std::make_tuple(10, 0.0f),
+    };
+
+    for (int i = 0; i < values.size(); i++) {
+
+        heap.push(values[i]);
+    }
+
+    heap.update_value(14, 1.0f);
+    heap.update_value(11, 4.0f);
+
+    std::vector<std::tuple<uint8_t, float>> result;
+
+    while (heap.size() > 0) {
+
+        result.push_back(heap.pop());
+    }
+
+    ASSERT_EQ(target.size(), result.size());
+
+    for (int i = 0; i < result.size(); i++) {
+
+        EXPECT_EQ(target[i], result[i]);
+    }
+}
