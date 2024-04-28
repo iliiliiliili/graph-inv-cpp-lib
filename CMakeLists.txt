@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.9)
 
 project(ginv)
 
@@ -16,3 +16,23 @@ FetchContent_MakeAvailable(json)
 
 add_executable(${EXEC} ${SOURCES})
 target_link_libraries(${EXEC} PRIVATE nlohmann_json::nlohmann_json)
+
+#------------test----------------
+
+enable_testing()
+
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+set(TEST_EXEC test_ginv)
+file(GLOB TEST_SOURCES tests/*.cpp)
+add_executable(${TEST_EXEC} ${TEST_SOURCES})
+target_link_libraries(${TEST_EXEC} nlohmann_json::nlohmann_json GTest::gtest_main)
+
+include(GoogleTest)
+gtest_discover_tests(${TEST_EXEC})
+
+#------------end-test------------

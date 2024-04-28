@@ -116,6 +116,8 @@ public:
 
             reduce_size();
         }
+
+        return value;
     }
     TValue remove(TKeys... keys)
     {
@@ -266,7 +268,7 @@ public:
 
     size_t get_node_position_in_map(TKeysTuple key)
     {
-        return m_node_position_map[key];
+        return m_node_position_map.at(key);
     }
 
     void set_node_position_in_map(TKeysTuple key, size_t position)
