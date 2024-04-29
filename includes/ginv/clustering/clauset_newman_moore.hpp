@@ -19,14 +19,12 @@
 namespace clustering {
 
 template <typename TId>
-void display_communities(std::vector<std::vector<TId>> communities)
+void display_communities(std::vector<std::vector<TId>> communities, bool show_size = true, std::ostream& stream = std::cout)
 {
-
-    bool show_size = communities.size() > 1000;
 
     std::sort(communities.begin(), communities.end(), [](auto a, auto b) { return a.size() > b.size(); });
 
-    std::cout << "communities {";
+    stream << "communities {";
     int count = 1;
     int non_zero_size = 0;
 
@@ -43,31 +41,31 @@ void display_communities(std::vector<std::vector<TId>> communities)
                 count++;
             } else {
 
-                std::cout << "s" << communities[i].size() << (count > 1 ? "x" + std::to_string(count) : "") << (i == communities.size() - 1 ? "" : ", ");
+                stream << "s" << communities[i].size() << (count > 1 ? "x" + std::to_string(count) : "") << (i == communities.size() - 1 ? "" : ", ");
                 count = 1;
             }
 
         } else {
 
-            std::cout << "[";
+            stream << "[";
 
             for (int q = 0; q < communities[i].size(); q++) {
 
-                std::cout << communities[i][q] << (q == communities[i].size() - 1 ? "" : ", ");
+                stream << communities[i][q] << (q == communities[i].size() - 1 ? "" : ", ");
             }
 
-            std::cout << "]" << (i == communities.size() - 1 ? "" : ", ");
+            stream << "]" << (i == communities.size() - 1 ? "" : ", ");
         }
     }
 
-    std::cout << "}";
-    
+    stream << "}";
+
     if (show_size) {
 
-        std::cout<<" ["<<non_zero_size<<"]";
+        stream << " [" << non_zero_size << "]";
     }
 
-    std::cout<< std::endl;
+    stream << std::endl;
 }
 
 template <
@@ -398,7 +396,7 @@ std::vector<std::vector<TId>> greedy_modularity_communities(
         auto dq = step();
 
         if (verbose) {
-            display_communities(std::vector(communities));
+            display_communities(std::vector(communities), communities.size() > 10);
         }
 
         if (dq < 0) {

@@ -1,13 +1,15 @@
-#include <ginv/clustering/clauset_newman_moore.hpp>
-#include <ginv/clustering/decaying_max_heap.hpp>
-#include <ginv/istanbul_ein_dataset.hpp>
 #include <iostream>
-#include <osigma/oconnections.hpp>
-#include <osigma/ograph.hpp>
-#include <osigma/onodes.hpp>
 #include <tuple>
 #include <vector>
 #include <string>
+#include <fstream>
+
+#include <ginv/clustering/clauset_newman_moore.hpp>
+#include <ginv/clustering/decaying_max_heap.hpp>
+#include <ginv/istanbul_ein_dataset.hpp>
+#include <osigma/oconnections.hpp>
+#include <osigma/ograph.hpp>
+#include <osigma/onodes.hpp>
 
 
 void create_communities(size_t node_count=0, std::string data_path = "./data/istanbul") {
@@ -70,13 +72,17 @@ void create_communities(size_t node_count=0, std::string data_path = "./data/ist
 
     auto communities = clustering::greedy_modularity_communities<float>(istanbul_dataset, 1.0f, 1, true);
     
-    clustering::display_communities(communities);
+
+    std::ofstream file("./communities_" + std::to_string(node_count) + ".txt");
+    clustering::display_communities(communities, false, file);
+    clustering::display_communities(communities, true, file);
+    file.close();
 }
 
 int main(int argc, char** argv)
 {
 
-    create_communities(10000);
+    create_communities(100000);
 
     return 0;
 }
