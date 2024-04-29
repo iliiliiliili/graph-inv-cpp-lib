@@ -29,7 +29,7 @@ public:
     {
     }
 
-    int node_count()
+    size_t node_count()
     {
 
         return m_nodes.m_x_coordinates.size();

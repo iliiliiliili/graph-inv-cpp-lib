@@ -14,7 +14,7 @@ using istanbul::IstanbulEinDatasetBin;
 using json = nlohmann::json;
 
 template <typename T>
-void read(std::string file_name, int file_count, std::vector<T> storage)
+void read(std::string file_name, int file_count, std::vector<T>& storage)
 {
 
     size_t offset = 0;

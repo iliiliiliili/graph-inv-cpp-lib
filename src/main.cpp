@@ -1,59 +1,82 @@
+#include <ginv/clustering/clauset_newman_moore.hpp>
 #include <ginv/clustering/decaying_max_heap.hpp>
 #include <ginv/istanbul_ein_dataset.hpp>
 #include <iostream>
 #include <osigma/oconnections.hpp>
 #include <osigma/ograph.hpp>
 #include <osigma/onodes.hpp>
-#include <vector>
 #include <tuple>
+#include <vector>
+#include <string>
+
+
+void create_communities(size_t node_count=0, std::string data_path = "./data/istanbul") {
+
+    istanbul::IstanbulEinDatasetBin istanbul_dataset("./data/istanbul");
+    std::cout << istanbul_dataset.describe() << std::endl;
+
+    if (node_count > 0) {
+
+        std::cout<<"Reducing the dataset"<<std::endl;
+
+        istanbul_dataset.m_nodes.m_x_coordinates.resize(node_count);
+        istanbul_dataset.m_nodes.m_y_coordinates.resize(node_count);
+        istanbul_dataset.m_nodes.m_z_index.resize(node_count);
+        
+        std::apply([node_count](auto&... features){
+
+            (features.resize(node_count), ...);
+        }, istanbul_dataset.m_nodes.m_features);
+
+        int i = 0;
+        int subset_graph_connections_start = istanbul_dataset.connection_count();
+        int subset_graph_connections_end = 0;
+
+        while (istanbul_dataset.m_connections.m_from[i] < node_count) {
+
+            if (
+                (istanbul_dataset.m_connections.m_to[i] >= 0) &&
+                (istanbul_dataset.m_connections.m_to[i] < node_count) &&
+                (istanbul_dataset.m_connections.m_from[i] != istanbul_dataset.m_connections.m_to[i])
+            ) {
+                
+                subset_graph_connections_start = std::min(subset_graph_connections_start, i);
+                subset_graph_connections_end = std::max(subset_graph_connections_end, i);
+            }
+
+            i++;
+        }
+
+        auto erase_outside_range = []<typename T>(std::vector<T>& v, size_t start, size_t end) {
+
+            if (start > 0) {
+
+                v.erase(v.begin(), v.begin() + start);
+            }
+            
+            if (end < v.size() - 1) {
+
+                v.erase(v.begin() + end, v.end());
+            }
+        };
+        
+        erase_outside_range(istanbul_dataset.m_connections.m_from, subset_graph_connections_start, subset_graph_connections_end);
+        erase_outside_range(istanbul_dataset.m_connections.m_to, subset_graph_connections_start, subset_graph_connections_end);
+        erase_outside_range(istanbul_dataset.m_connections.m_values, subset_graph_connections_start, subset_graph_connections_end);
+        erase_outside_range(istanbul_dataset.m_connections.m_z_index, subset_graph_connections_start, subset_graph_connections_end);
+
+        std::cout << istanbul_dataset.describe() << std::endl;
+    }
+
+    auto communities = clustering::greedy_modularity_communities<float>(istanbul_dataset, 1.0f, 1, true);
+    
+    clustering::display_communities(communities);
+}
 
 int main(int argc, char** argv)
 {
 
-    clustering::DecayingMaxHeap<float, int, int> heap(10);
-
-    std::cout << heap.describe() << std::endl;
-
-    heap.push(10, 15, 4);
-    heap.push(1, 11, 12.22);
-    auto top_key = heap.top_key();
-    std::get<0>(top_key) = 1333;
-    heap.push(top_key, 17);
-    auto top = heap.top();
-    std::get<1>(top) = 1333;
-    std::get<2>(top) = 0.1;
-    heap.push(top);
-
-    std::cout << heap.describe_element(0) << std::endl;
-    std::cout << heap.describe_element(1) << std::endl;
-    std::cout << heap.describe_element(2) << std::endl;
-    std::cout << heap.describe_element(3) << std::endl;
-    std::cout << heap.describe_element(4) << std::endl;
-
-    auto show = [](auto&... values) { return ((std::to_string(values) + ", ") + ...); };
-    auto pop_show = [&heap, &show]() {
-        
-        auto result = heap.pop();
-        std::cout<<std::apply(show, result)<<std::endl;
-        std::cout<<heap.size()<<std::endl;
-    };
-
-    pop_show();
-    pop_show();
-    pop_show();
-    pop_show();
-
-    std::cout << "-----------------" << std::endl;
-    std::cout << heap.describe_element(0) << std::endl;
-    std::cout << heap.describe_element(1) << std::endl;
-    std::cout << heap.describe_element(2) << std::endl;
-    std::cout << heap.describe_element(3) << std::endl;
-    std::cout << heap.describe_element(4) << std::endl;
-
-    return 0;
-
-    istanbul::IstanbulEinDatasetBin istanbul_dataset("./data/istanbul");
-    std::cout << istanbul_dataset.describe() << std::endl;
+    create_communities(10000);
 
     return 0;
 }

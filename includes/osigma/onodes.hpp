@@ -34,13 +34,14 @@ class OSpatialNodes : public ONodes<TFeatures...> {
 public:
     std::vector<TCoordinates> m_x_coordinates;
     std::vector<TCoordinates> m_y_coordinates;
+    std::vector<TZIndex> m_z_index;
 
     explicit OSpatialNodes(
         std::vector<TCoordinates> x_coordinates, std::vector<TCoordinates> y_coordinates,
         std::vector<TZIndex> z_index, std::vector<TFeatures>... features)
         : ONodes<TFeatures...>(features...)
         , m_x_coordinates(x_coordinates)
-        , m_y_coordinates(y_coordinates)
+        , m_z_index(z_index)
     {
     }
     std::string describe() const
