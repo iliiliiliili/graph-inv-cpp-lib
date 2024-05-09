@@ -4,17 +4,16 @@ project(ginv)
 
 set(EXEC ginv)
 set(CMAKE_CXX_STANDARD 20)
-
-include_directories(includes)
 include(FetchContent)
 
+include_directories(includes)
 file(GLOB SOURCES src/*.cpp)
-
+add_executable(${EXEC} ${SOURCES})
 
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
-add_executable(${EXEC} ${SOURCES})
+# add_subdirectory(src/drgraph)
 target_link_libraries(${EXEC} PRIVATE nlohmann_json::nlohmann_json)
 
 #------------test----------------

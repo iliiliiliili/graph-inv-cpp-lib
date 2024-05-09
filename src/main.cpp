@@ -82,7 +82,7 @@ void create_communities(size_t node_count=0, std::string data_path = "./data/ist
 int main(int argc, char** argv)
 {
 
-    create_communities(100000);
+    create_communities(1000);
 
     return 0;
 }
